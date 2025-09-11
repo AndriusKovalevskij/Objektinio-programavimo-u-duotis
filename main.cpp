@@ -20,7 +20,7 @@ struct Studentas
     string pavarde;
     vector <int> ndpazymiai;
     int egzrezultatas;
-    double galutinis;
+    double galutinis_vidurkis;
 
 };
 
@@ -91,10 +91,10 @@ Studentas Stud_ivestis(int studentoNr)
     pirmas.egzrezultatas = ivestiSkaiciu("Iveskite egzamino rezultata (1-10): ");
     if (n > 0)
     {
-        pirmas.galutinis = double(sum) / double(n) * 0.4 + pirmas.egzrezultatas * 0.6;
+        pirmas.galutinis_vidurkis = double(sum) / double(n) * 0.4 + pirmas.egzrezultatas * 0.6;
 
     } else {
-        pirmas.galutinis = pirmas.egzrezultatas * 0.6;
+        pirmas.galutinis_vidurkis = pirmas.egzrezultatas * 0.6;
     }
     return pirmas;
 }
@@ -111,29 +111,16 @@ int main()
     }
 
     cout << "\nStudento informacija:" << endl;
-    cout << left << setw(10) << "Vardas" << "|"
-         << left << setw(15) << "Pavarde" << "|"
-         << left << setw(20) << "ND pazymiai" << "|"
+    cout << left << setw(20) << "Vardas" << "|"
+         << left << setw(20) << "Pavarde" << "|"
          << left << setw(10) << "Galutinis (Vid.)" << endl;
-    cout << string(70, '-') << endl;
+    cout << string(60, '-') << endl;
 
     for (auto Past : Grupe)
     {
-        cout << setw(10) << left << Past.vardas << "|"
-             << setw(15) << left << Past.pavarde << "|";
-
-        string pazymiai_str = "";
-        if (Past.ndpazymiai.empty())
-        {
-            pazymiai_str = "nera";
-        } else {
-            for (auto& a : Past.ndpazymiai)
-            {
-                pazymiai_str += to_string(a) + " ";
-            }
-        }
-        cout << setw(20) << left << pazymiai_str << "|"
-             << fixed << setprecision(2) << setw(10) << left << Past.galutinis << endl;
+        cout << setw(20) << left << Past.vardas << "|"
+             << setw(20) << left << Past.pavarde << "|"
+             << fixed << setprecision(2) << setw(10) << left << Past.galutinis_vidurkis << endl;
     }
     return 0;
 }
