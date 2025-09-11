@@ -21,6 +21,7 @@ struct Studentas
     vector <int> ndpazymiai;
     int egzrezultatas;
     double galutinis_vidurkis;
+    double galutine_mediana;
 
 };
 
@@ -66,6 +67,34 @@ string ivestiVarda(const string& zinute)
     return vardas;
 }
 
+void Rusiavimas(vector<int>& vec) {
+    int n = vec.size();
+    for (int i = 0; i < n - 1; ++i) {
+        for (int j = 0; j < n - i - 1; ++j) {
+            if (vec[j] > vec[j + 1]) {
+                int temp = vec[j];
+                vec[j] = vec[j + 1];
+                vec[j + 1] = temp;
+            }
+        }
+    }
+}
+
+double MedianosSkaiciavimas(vector<int> pazymiai)
+{
+    int dydis = pazymiai.size();
+    if (dydis == 0) return 0;
+
+    Rusiavimas(pazymiai);
+
+    if (dydis % 2 == 0)
+    {
+        return (pazymiai[dydis / 2 - 1] + pazymiai[dydis / 2]) / 2.0;
+    } else {
+        return pazymiai[dydis / 2];
+    }
+}
+
 // Studento duomenu ivestis
 Studentas Stud_ivestis(int studentoNr)
 {
@@ -92,9 +121,10 @@ Studentas Stud_ivestis(int studentoNr)
     if (n > 0)
     {
         pirmas.galutinis_vidurkis = double(sum) / double(n) * 0.4 + pirmas.egzrezultatas * 0.6;
-
+        pirmas.galutine_mediana = MedianosSkaiciavimas(pirmas.ndpazymiai) * 0.4 + pirmas.egzrezultatas *0.6;
     } else {
         pirmas.galutinis_vidurkis = pirmas.egzrezultatas * 0.6;
+        pirmas.galutine_mediana = pirmas.egzrezultatas * 0.6;
     }
     return pirmas;
 }
@@ -110,17 +140,50 @@ int main()
         Grupe.push_back(Stud_ivestis(z + 1));
     }
 
+    int pasirinkimas;
+    cout << "\nPasirinkite galutinio ivertinimo tipa:" << endl;
+    cout << "1 - Pagal vidurki" << endl;
+    cout << "2 - Pagal mediana" << endl;
+    cout << "3 - Rodyti abu" << endl;
+    pasirinkimas = ivestiSkaiciu("Jusu pasirinkimas: ", 1, 3);
+
     cout << "\nStudento informacija:" << endl;
     cout << left << setw(20) << "Vardas" << "|"
-         << left << setw(20) << "Pavarde" << "|"
-         << left << setw(10) << "Galutinis (Vid.)" << endl;
-    cout << string(60, '-') << endl;
+         << left << setw(20) << "Pavarde";
 
-    for (auto Past : Grupe)
+    if (pasirinkimas == 1)
+    {
+        cout << "|" << left << setw(20) << "Galutinis (vid.)";
+    } else if (pasirinkimas == 2) {
+        cout << "|" << left << setw(20) << "Galutinis (Med.)";
+    } else {
+        cout << "|" << left << setw(20) << "Galutinis (Vid.)"
+             << "|" << left << setw(20) << "Galutinis (Med.)";
+    }
+    cout << endl;
+
+    if (pasirinkimas == 3)
+    {
+        cout << string(80, '-') << endl;
+    } else {
+        cout << string(60, '-') << endl;
+    }
+
+    for (const auto Past : Grupe)
     {
         cout << setw(20) << left << Past.vardas << "|"
-             << setw(20) << left << Past.pavarde << "|"
-             << fixed << setprecision(2) << setw(10) << left << Past.galutinis_vidurkis << endl;
+             << setw(20) << left << Past.pavarde;
+
+        if (pasirinkimas == 1)
+        {
+            cout << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutinis_vidurkis;
+        } else if (pasirinkimas == 2){
+            cout << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutine_mediana;
+        } else {
+            cout << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutinis_vidurkis
+                 << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutine_mediana;
+        }
+        cout << endl;
     }
     return 0;
 }
