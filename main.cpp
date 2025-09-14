@@ -2,6 +2,8 @@
 #include <iomanip>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <sstream>
 
 using namespace std;
 using std::cout;
@@ -25,20 +27,32 @@ struct Studentas
 
 };
 
+void ivestiesIsvalymas()
+{
+    cin.clear();
+    cin.ignore(10000, '\n');
+}
+
 // Funkcija pazymiu ivesties klaidoms gaudyti
 int ivestiSkaiciu(const string& zinute, int min_pazymys = 1, int max_pazymys = 10)
 {
     int skaicius;
-    cout << zinute;
-    if(!(cin >> skaicius))
-    {
-        cout << "Klaida: ivestis turi buti skaicius!" << endl;
-        exit(1);
-    }
-    if(skaicius < min_pazymys || skaicius > max_pazymys)
-    {
-        cout << "Klaida: skaicius turi buti nuo " << min_pazymys << " iki " << max_pazymys << "!" <<endl;
-        exit(1);
+
+    while (true) {
+        cout << zinute;
+        if(!(cin >> skaicius))
+        {
+            cout << "Klaida: ivestis turi buti skaicius! Pabandykite dar karta." << endl;
+            ivestiesIsvalymas();
+            continue;
+        }
+
+        if(skaicius < min_pazymys || skaicius > max_pazymys)
+        {
+            cout << "Klaida: skaicius turi buti nuo " << min_pazymys << " iki " << max_pazymys << "! Pabandykite dar karta." <<endl;
+            continue;
+        }
+        break;
     }
     return skaicius;
 }
@@ -47,37 +61,36 @@ int ivestiSkaiciu(const string& zinute, int min_pazymys = 1, int max_pazymys = 1
 string ivestiVarda(const string& zinute)
 {
     string vardas;
-    cout << zinute;
-    cin >> vardas;
+    while (true) {
+        cout << zinute;
+        cin >> vardas;
 
-    for (char c : vardas)
-    {
-        if (!isalpha(c))
+        bool tinkamas = true;
+
+        if (vardas.empty())
         {
-            cout << "Klaida: vardas/pavarde turi buti tik is raidziu!" << endl;
-            exit(1);
-        }
-    }
-
-    if (vardas.empty())
-    {
-        cout << "Klaida: vardas/pavarde negali buti be raidziu!" << endl;
-        exit(1);
-    }
-    return vardas;
-}
-
-void Rusiavimas(vector<int>& vec) {
-    int n = vec.size();
-    for (int i = 0; i < n - 1; ++i) {
-        for (int j = 0; j < n - i - 1; ++j) {
-            if (vec[j] > vec[j + 1]) {
-                int temp = vec[j];
-                vec[j] = vec[j + 1];
-                vec[j + 1] = temp;
+            cout << "Klaida: vardas/pavarde negali buti be raidziu! Pabandykite dar karta." << endl;
+            tinkamas = false;
+        } else {
+            for (char c : vardas)
+            {
+                if (!isalpha(c))
+                {
+                    cout << "Klaida: vardas/pavarde turi buti tik is raidziu! Pabandykite dar karta." << endl;
+                    tinkamas = false;
+                    break;
+                }
             }
         }
+
+        if (tinkamas)
+        {
+            break;
+        }
+
+        ivestiesIsvalymas();
     }
+    return vardas;
 }
 
 double MedianosSkaiciavimas(vector<int> pazymiai)
@@ -85,7 +98,7 @@ double MedianosSkaiciavimas(vector<int> pazymiai)
     int dydis = pazymiai.size();
     if (dydis == 0) return 0;
 
-    Rusiavimas(pazymiai);
+    sort(pazymiai.begin(), pazymiai.end());
 
     if (dydis % 2 == 0)
     {
@@ -95,31 +108,70 @@ double MedianosSkaiciavimas(vector<int> pazymiai)
     }
 }
 
+void NDpazymiuivestis(vector<int>& ndpazymiai)
+{
+    string eilute;
+    int pazymys;
+
+    cout << "Iveskite namu darbu pazymius (1-10). Norint baigti ivedima, paspauskite ENTER 2 kartus:" << endl;
+
+    // Praleidziama newline po ankstesnio cin
+    cin.ignore();
+
+    int numeris = 1;
+    while (true)
+    {
+        cout << numeris << ": ";
+        getline(cin, eilute);
+
+        if (eilute.empty())
+        {
+            break;
+        }
+
+        stringstream ss(eilute);
+        if (ss >> pazymys)
+        {
+            if (pazymys >= 1 && pazymys <= 10)
+            {
+                ndpazymiai.push_back(pazymys);
+                numeris++;
+            } else {
+                cout << "Klaida: pazymys turi buti nuo 1 iki 10!" << endl;
+            }
+        }
+        else {
+            cout << "Klaida: ivestis turi buti skaicius!" << endl;
+        }
+        }
+    }
+
+
 // Studento duomenu ivestis
 Studentas Stud_ivestis(int studentoNr)
 {
-    int n, laikinas_paz, sum = 0;
     Studentas pirmas;
     cout << "\nIveskite " << studentoNr << "-o studento duomenis" << endl;
     pirmas.vardas = ivestiVarda("Vardas: ");
     pirmas.pavarde = ivestiVarda("Pavarde: ");
-    cout << "Kiek namu darbu pazymiu turi " << pirmas.vardas << " " << pirmas.pavarde << "? ";
-    n = ivestiSkaiciu("", 0, 10);
 
+    NDpazymiuivestis(pirmas.ndpazymiai);
+
+    int n = pirmas.ndpazymiai.size();
     if (n == 0) {
         cout << "Studentas neturi namu darbu pazymiu." << endl;
     } else {
-        cout << "Iveskite namu darbu pazymius (1-10):" << endl;
-        for (int a = 0; a < n; a++)
-        {
-        laikinas_paz =ivestiSkaiciu(to_string(a + 1) + ": ");
-        pirmas.ndpazymiai.push_back(laikinas_paz);
-        sum += laikinas_paz;
-        }
+        cout << "Ivesti " << n << " namu darbu pazymiai." << endl;
     }
+
     pirmas.egzrezultatas = ivestiSkaiciu("Iveskite egzamino rezultata (1-10): ");
     if (n > 0)
     {
+        int sum = 0;
+        for (int pazymys : pirmas.ndpazymiai)
+        {
+            sum += pazymys;
+        }
         pirmas.galutinis_vidurkis = double(sum) / double(n) * 0.4 + pirmas.egzrezultatas * 0.6;
         pirmas.galutine_mediana = MedianosSkaiciavimas(pirmas.ndpazymiai) * 0.4 + pirmas.egzrezultatas *0.6;
     } else {
