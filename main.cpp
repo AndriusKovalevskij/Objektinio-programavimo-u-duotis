@@ -4,6 +4,8 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 using std::cout;
@@ -146,16 +148,48 @@ void NDpazymiuivestis(vector<int>& ndpazymiai)
         }
     }
 
+int AtsitiktinioPazymioGeneravimas()
+{
+    return rand() % 10 + 1;
+}
+
+void NDPazymiuGeneravimas(vector<int>& ndpazymiai)
+{
+    int kiekis = ivestiSkaiciu("Kiek namu darbu pazymiu generuoti? ");
+
+    if (kiekis == 0)
+    {
+        cout << "Negeneruojami namu darbu pazymiai."<< endl;
+        return;
+    }
+
+    cout << "Sugeneruoti namu darbu pazymiai: ";
+    for (int i = 0; i < kiekis; i++)
+    {
+        int  pazymys = AtsitiktinioPazymioGeneravimas();
+        ndpazymiai.push_back(pazymys);
+        cout << pazymys << " ";
+    }
+    cout << endl;
+}
 
 // Studento duomenu ivestis
-Studentas Stud_ivestis(int studentoNr)
+Studentas Stud_ivestis(int studentoNr, bool atsitiktinai = false)
 {
     Studentas pirmas;
     cout << "\nIveskite " << studentoNr << "-o studento duomenis" << endl;
     pirmas.vardas = ivestiVarda("Vardas: ");
     pirmas.pavarde = ivestiVarda("Pavarde: ");
 
-    NDpazymiuivestis(pirmas.ndpazymiai);
+    if (atsitiktinai)
+    {
+        NDPazymiuGeneravimas(pirmas.ndpazymiai);
+        pirmas.egzrezultatas = AtsitiktinioPazymioGeneravimas();
+        cout << "Sugeneruotas egzamino pazymys: " << pirmas.egzrezultatas << endl;
+    } else {
+        NDpazymiuivestis(pirmas.ndpazymiai);
+        pirmas.egzrezultatas = ivestiSkaiciu("Iveskite egzamino rezultata (1-10): ");
+    }
 
     int n = pirmas.ndpazymiai.size();
     if (n == 0) {
@@ -164,7 +198,6 @@ Studentas Stud_ivestis(int studentoNr)
         cout << "Ivesti " << n << " namu darbu pazymiai." << endl;
     }
 
-    pirmas.egzrezultatas = ivestiSkaiciu("Iveskite egzamino rezultata (1-10): ");
     if (n > 0)
     {
         int sum = 0;
@@ -181,15 +214,21 @@ Studentas Stud_ivestis(int studentoNr)
     return pirmas;
 }
 
-int main()
+int rodytiMeniu()
 {
-    cout << "Laba diena" << endl;
-    vector<Studentas> Grupe;
-    int m = ivestiSkaiciu("Kiek studentu grupeje?: ", 1, 100000);
+    cout << "\n PROGRAMOS MENIU" << endl;
+    cout << "1 - Ivesti duomenis rankiniu budu" << endl;
+    cout << "2 - Generuoti duomenis atsitiktinai" << endl;
+    cout << "3 - Baigti programa" << endl;
 
-    for (auto z = 0; z < m; z++)
-    {
-        Grupe.push_back(Stud_ivestis(z + 1));
+    return ivestiSkaiciu("Pasirinkite buda (1-3): ", 1, 3);
+}
+
+void rodytiRezultatus(const vector<Studentas>& Grupe)
+{
+    if (Grupe.empty()) {
+        cout << "Nera ivestos informacijos apie studentus!" << endl;
+        return;
     }
 
     int pasirinkimas;
@@ -237,5 +276,57 @@ int main()
         }
         cout << endl;
     }
+}
+
+int main()
+{
+    srand(time(0));
+
+    cout << "Laba diena" << endl;
+    vector<Studentas> Grupe;
+
+    while (true)
+    {
+        int pasirinkimas = rodytiMeniu();
+
+        switch (pasirinkimas)
+        {
+            case 1: {
+                // Rankinis duomenu ivedimas
+                int m = ivestiSkaiciu("Kiek studentu grupeje?: ", 1, 100000);
+                for (int z = 0; z < m; z++) {
+                    Grupe.push_back(Stud_ivestis(z + 1, false));
+                }
+                rodytiRezultatus(Grupe);
+                break;
+            }
+            case 2: {
+                // Atsitiktinis duomenu generavimas
+                int m = ivestiSkaiciu("Kiek studentu grupeje?: ", 1, 100000);
+                for (int z = 0; z < m; z++) {
+                    Grupe.push_back(Stud_ivestis(z + 1, true));
+                }
+                rodytiRezultatus(Grupe);
+                break;
+            }
+            case 3: {
+                // Baigti programa
+                cout << "Geros dienos!" << endl;
+                return 0;
+            }
+        }
+
+        cout << "\nAr norite testi programos darba? (1 - taip, 2 - ne): ";
+        int testi = ivestiSkaiciu("", 1, 2);
+        if (testi == 2)
+        {
+            cout << "Geros dienos!" << endl;
+            break;
+        }
+
+        // Isvaloma grupe naujam ciklui
+        Grupe.clear();
+    }
     return 0;
 }
+
