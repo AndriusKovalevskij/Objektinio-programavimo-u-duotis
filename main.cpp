@@ -6,6 +6,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 
 using namespace std;
 using std::cout;
@@ -173,6 +174,93 @@ void NDPazymiuGeneravimas(vector<int>& ndpazymiai)
     cout << endl;
 }
 
+bool skaitytiDuomenisIsFailo(const string& failoPavadinimas, vector<Studentas>& studentai)
+{
+    ifstream failas(failoPavadinimas);
+    if (!failas.is_open())
+    {
+        cout << "Klaida: nepavyko atidaryti failo " << failoPavadinimas << endl;
+        return false;
+    }
+
+    string eilute;
+
+    // Praleidziame antrašte
+    if (!getline(failas, eilute))
+    {
+        cout << "Klaida: failas tuscias arba pazeistas" << endl;
+        failas.close();
+        return false;
+    }
+
+    int studentuSkaicius = 0;
+    while (getline(failas, eilute))
+    {
+        if (eilute.empty()) continue;
+
+        stringstream ss(eilute);
+        Studentas studentas;
+
+        // Skaitome varda ir pavarde
+        if (!(ss >> studentas.pavarde >> studentas.vardas))
+        {
+            cout << "Klaida skaitant eilute: " << eilute << endl;
+            continue;
+        }
+
+        // Skaitome namu darbu pazymius ir egzamino rezultata
+        int pazymys;
+        vector<int> visi_pazymiai;
+
+        while (ss >> pazymys)
+        {
+            if (pazymys < 1 || pazymys > 10)
+            {
+                cout << "Netinkamas pazymys " << pazymys << " studentui "
+                     << studentas.vardas << " " << studentas.pavarde << endl;
+                continue;
+            }
+            visi_pazymiai.push_back(pazymys);
+        }
+
+        if (visi_pazymiai.empty())
+        {
+            cout << "Studentas " << studentas.vardas << " " << studentas.pavarde
+                 << " neturi pazymiu" << endl;
+            continue;
+        }
+
+        // Paskutinis pazymys yra egzamino rezultatas
+        studentas.egzrezultatas = visi_pazymiai.back();
+        visi_pazymiai.pop_back();
+
+        // Like pazymiai yra namu darbai
+        studentas.ndpazymiai = visi_pazymiai;
+
+        // Skaiciuojame galutini pazymi
+        if (studentas.ndpazymiai.size() > 0)
+        {
+            int sum = 0;
+            for (int nd_pazymys : studentas.ndpazymiai)
+            {
+                sum += nd_pazymys;
+            }
+            studentas.galutinis_vidurkis = double(sum) / double(studentas.ndpazymiai.size()) * 0.4 + studentas.egzrezultatas * 0.6;
+            studentas.galutine_mediana = MedianosSkaiciavimas(studentas.ndpazymiai) * 0.4 + studentas.egzrezultatas * 0.6;
+        } else {
+            studentas.galutinis_vidurkis = studentas.egzrezultatas * 0.6;
+            studentas.galutine_mediana = studentas.egzrezultatas * 0.6;
+        }
+
+        studentai.push_back(studentas);
+        studentuSkaicius++;
+    }
+
+    failas.close();
+    cout << "Sekmingai nuskaityta " << studentuSkaicius << " studentu duomenys. " << endl;
+    return true;
+}
+
 // Studento duomenu ivestis
 Studentas Stud_ivestis(int studentoNr, bool atsitiktinai = false)
 {
@@ -219,9 +307,10 @@ int rodytiMeniu()
     cout << "\n PROGRAMOS MENIU" << endl;
     cout << "1 - Ivesti duomenis rankiniu budu" << endl;
     cout << "2 - Generuoti duomenis atsitiktinai" << endl;
-    cout << "3 - Baigti programa" << endl;
+    cout << "3 - Nuskaityti duomenis is failo" << endl;
+    cout << "4 - Baigti programa" << endl;
 
-    return ivestiSkaiciu("Pasirinkite buda (1-3): ", 1, 3);
+    return ivestiSkaiciu("Pasirinkite buda (1-4): ", 1, 4);
 }
 
 void rodytiRezultatus(const vector<Studentas>& Grupe)
@@ -310,6 +399,20 @@ int main()
                 break;
             }
             case 3: {
+                // Skaitymas iš failo
+                cout << "Iveskite failo pavadinima (pvz., kursiokai.txt): ";
+                string failoPavadinimas;
+                cin >> failoPavadinimas;
+
+                if (skaitytiDuomenisIsFailo(failoPavadinimas, Grupe))
+                {
+                    rodytiRezultatus(Grupe);
+                } else {
+                    cout << "Nepavyko nuskaityti duomenu is failo." << endl;
+                }
+                break;
+            }
+            case 4: {
                 // Baigti programa
                 cout << "Geros dienos!" << endl;
                 return 0;
@@ -329,4 +432,3 @@ int main()
     }
     return 0;
 }
-
