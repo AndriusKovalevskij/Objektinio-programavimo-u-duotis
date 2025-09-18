@@ -30,10 +30,11 @@ struct Studentas
 
 };
 
+// Ivesties isvalymas (naudojamas, kai ivedamas netinkamas irasas)
 void ivestiesIsvalymas()
 {
     cin.clear();
-    cin.ignore(10000, '\n');
+    cin.ignore(10000, '\n');    //Isvaloma tiek simboliu, arba iki tol kol randa \n
 }
 
 // Funkcija pazymiu ivesties klaidoms gaudyti
@@ -43,14 +44,14 @@ int ivestiSkaiciu(const string& zinute, int min_pazymys = 1, int max_pazymys = 1
 
     while (true) {
         cout << zinute;
-        if(!(cin >> skaicius))
+        if(!(cin >> skaicius))  // Jeigu ivestis nera skaicius
         {
             cout << "Klaida: ivestis turi buti skaicius! Pabandykite dar karta." << endl;
             ivestiesIsvalymas();
             continue;
         }
 
-        if(skaicius < min_pazymys || skaicius > max_pazymys)
+        if(skaicius < min_pazymys || skaicius > max_pazymys)    // Tikrinamos ivesties ribos
         {
             cout << "Klaida: skaicius turi buti nuo " << min_pazymys << " iki " << max_pazymys << "! Pabandykite dar karta." <<endl;
             continue;
@@ -60,7 +61,7 @@ int ivestiSkaiciu(const string& zinute, int min_pazymys = 1, int max_pazymys = 1
     return skaicius;
 }
 
-// Funkcija vardo/pavardes ivesties klaidos gaudyti
+// Funkcija vardo/pavardes ivesties klaidoms gaudyti
 string ivestiVarda(const string& zinute)
 {
     string vardas;
@@ -75,6 +76,7 @@ string ivestiVarda(const string& zinute)
             cout << "Klaida: vardas/pavarde negali buti be raidziu! Pabandykite dar karta." << endl;
             tinkamas = false;
         } else {
+            // Tikriname, kad visi simboliai butu raides
             for (char c : vardas)
             {
                 if (!isalpha(c))
@@ -127,12 +129,12 @@ void NDpazymiuivestis(vector<int>& ndpazymiai)
         cout << numeris << ": ";
         getline(cin, eilute);
 
-        if (eilute.empty())
+        if (eilute.empty()) //jeigu eilute tuscia, ciklas baigiamas
         {
             break;
         }
 
-        stringstream ss(eilute);
+        stringstream ss(eilute);    //Objektas, kuris naudoja eilute, kaip ivesties saltini
         if (ss >> pazymys)
         {
             if (pazymys >= 1 && pazymys <= 10)
@@ -176,7 +178,7 @@ void NDPazymiuGeneravimas(vector<int>& ndpazymiai)
 
 bool skaitytiDuomenisIsFailo(const string& failoPavadinimas, vector<Studentas>& studentai)
 {
-    ifstream failas(failoPavadinimas);
+    ifstream failas(failoPavadinimas);  //Atidaromas failas skaitymui
     if (!failas.is_open())
     {
         cout << "Klaida: nepavyko atidaryti failo " << failoPavadinimas << endl;
@@ -185,7 +187,7 @@ bool skaitytiDuomenisIsFailo(const string& failoPavadinimas, vector<Studentas>& 
 
     string eilute;
 
-    // Praleidziame antrašte
+    // Praleidziame antraste
     if (!getline(failas, eilute))
     {
         cout << "Klaida: failas tuscias arba pazeistas" << endl;
@@ -231,8 +233,8 @@ bool skaitytiDuomenisIsFailo(const string& failoPavadinimas, vector<Studentas>& 
         }
 
         // Paskutinis pazymys yra egzamino rezultatas
-        studentas.egzrezultatas = visi_pazymiai.back();
-        visi_pazymiai.pop_back();
+        studentas.egzrezultatas = visi_pazymiai.back(); //Grazina paskutine elemento reiksme
+        visi_pazymiai.pop_back();   //Pasalina paskutini elementa is vektoriaus
 
         // Like pazymiai yra namu darbai
         studentas.ndpazymiai = visi_pazymiai;
@@ -261,7 +263,7 @@ bool skaitytiDuomenisIsFailo(const string& failoPavadinimas, vector<Studentas>& 
     return true;
 }
 
-// Studento duomenu ivestis
+// Studento duomenu ivestis (rankinis ivedimas)
 Studentas Stud_ivestis(int studentoNr, bool atsitiktinai = false)
 {
     Studentas pirmas;
@@ -302,13 +304,13 @@ Studentas Stud_ivestis(int studentoNr, bool atsitiktinai = false)
     return pirmas;
 }
 
-// Rusiavimo funkcija pagal varda
+// RIkiavimo funkcija pagal varda
 bool palyginimasPagalVarda(const Studentas& a, const Studentas& b)
 {
     return a.vardas < b.vardas;
 }
 
-// Rusiavimo funkcija pagal pavarde
+// Rikiavimo funkcija pagal pavarde
 bool palyginimasPagalPavarde(const Studentas& a, const Studentas& b)
 {
     return a.pavarde < b.pavarde;
@@ -334,7 +336,7 @@ void rodytiRezultatus(const vector<Studentas>& Grupe)
 
     int rusiuotiPagal = ivestiSkaiciu("\nKaip norite rusiuoti studentus?\n1 - Pagal varda\n2 - Pagal pavarde\nPasirinkimas: ", 1, 2);
 
-    // Vektoriaus kopija rusiavimui pagal studento varda
+    // Vektoriaus kopija rikiavimui pagal studento varda
     vector<Studentas> surusiuotiStudentai = Grupe;
     if (rusiuotiPagal == 1)
     {
@@ -392,7 +394,7 @@ void rodytiRezultatus(const vector<Studentas>& Grupe)
 
 int main()
 {
-    srand(time(0));
+    srand(time(0)); //Atsitiktiniu skaiciu generatoriaus inicializacija
 
     cout << "Laba diena" << endl;
     vector<Studentas> Grupe;
