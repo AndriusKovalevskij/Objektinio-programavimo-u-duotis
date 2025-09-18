@@ -302,6 +302,12 @@ Studentas Stud_ivestis(int studentoNr, bool atsitiktinai = false)
     return pirmas;
 }
 
+// Rusiavimo funkcija pagal varda
+bool palyginimasPagalVarda(const Studentas& a, const Studentas& b)
+{
+    return a.vardas < b.vardas;
+}
+
 int rodytiMeniu()
 {
     cout << "\n PROGRAMOS MENIU" << endl;
