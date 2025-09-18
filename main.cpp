@@ -308,6 +308,12 @@ bool palyginimasPagalVarda(const Studentas& a, const Studentas& b)
     return a.vardas < b.vardas;
 }
 
+// Rusiavimo funkcija pagal pavarde
+bool palyginimasPagalPavarde(const Studentas& a, const Studentas& b)
+{
+    return a.pavarde < b.pavarde;
+}
+
 int rodytiMeniu()
 {
     cout << "\n PROGRAMOS MENIU" << endl;
@@ -326,9 +332,16 @@ void rodytiRezultatus(const vector<Studentas>& Grupe)
         return;
     }
 
+    int rusiuotiPagal = ivestiSkaiciu("\nKaip norite rusiuoti studentus?\n1 - Pagal varda\n2 - Pagal pavarde\nPasirinkimas: ", 1, 2);
+
     // Vektoriaus kopija rusiavimui pagal studento varda
     vector<Studentas> surusiuotiStudentai = Grupe;
-    sort(surusiuotiStudentai.begin(), surusiuotiStudentai.end(), palyginimasPagalVarda);
+    if (rusiuotiPagal == 1)
+    {
+        sort(surusiuotiStudentai.begin(), surusiuotiStudentai.end(), palyginimasPagalVarda);
+    } else {
+        sort(surusiuotiStudentai.begin(), surusiuotiStudentai.end(), palyginimasPagalPavarde);
+    }
 
     int pasirinkimas;
     cout << "\nPasirinkite galutinio ivertinimo tipa:" << endl;
