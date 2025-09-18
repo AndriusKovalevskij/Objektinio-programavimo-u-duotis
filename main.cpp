@@ -202,7 +202,7 @@ bool skaitytiDuomenisIsFailo(const string& failoPavadinimas, vector<Studentas>& 
         Studentas studentas;
 
         // Skaitome varda ir pavarde
-        if (!(ss >> studentas.pavarde >> studentas.vardas))
+        if (!(ss >> studentas.vardas >> studentas.pavarde))
         {
             cout << "Klaida skaitant eilute: " << eilute << endl;
             continue;
@@ -326,6 +326,10 @@ void rodytiRezultatus(const vector<Studentas>& Grupe)
         return;
     }
 
+    // Vektoriaus kopija rusiavimui pagal studento varda
+    vector<Studentas> surusiuotiStudentai = Grupe;
+    sort(surusiuotiStudentai.begin(), surusiuotiStudentai.end(), palyginimasPagalVarda);
+
     int pasirinkimas;
     cout << "\nPasirinkite galutinio ivertinimo tipa:" << endl;
     cout << "1 - Pagal vidurki" << endl;
@@ -355,19 +359,19 @@ void rodytiRezultatus(const vector<Studentas>& Grupe)
         cout << string(60, '-') << endl;
     }
 
-    for (const auto Past : Grupe)
+    for (const auto& studentas : surusiuotiStudentai)
     {
-        cout << setw(20) << left << Past.vardas << "|"
-             << setw(20) << left << Past.pavarde;
+        cout << setw(20) << left << studentas.vardas << "|"
+             << setw(20) << left << studentas.pavarde;
 
         if (pasirinkimas == 1)
         {
-            cout << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutinis_vidurkis;
+            cout << "|" << fixed << setprecision(2) << setw(20) << left << studentas.galutinis_vidurkis;
         } else if (pasirinkimas == 2){
-            cout << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutine_mediana;
+            cout << "|" << fixed << setprecision(2) << setw(20) << left << studentas.galutine_mediana;
         } else {
-            cout << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutinis_vidurkis
-                 << "|" << fixed << setprecision(2) << setw(20) << left << Past.galutine_mediana;
+            cout << "|" << fixed << setprecision(2) << setw(20) << left << studentas.galutinis_vidurkis
+                 << "|" << fixed << setprecision(2) << setw(20) << left << studentas.galutine_mediana;
         }
         cout << endl;
     }
